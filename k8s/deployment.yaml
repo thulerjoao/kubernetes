@@ -58,8 +58,14 @@ spec:
           volumeMounts:
             - mountPath: "/go/myfamily" #onde será montado o voulume
               name: config #mesmo nome do volume abaixo
+              readOnly: true
+            - mountPath: "/go/pvc"
+              name: goserver-volume
 
       volumes:
+        - name: goserver-volume
+          persistentVolumeClaim:
+            claimName: goserver-pvc
         - name: config
           configMap: 
             name: configmap-family
