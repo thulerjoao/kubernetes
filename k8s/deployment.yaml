@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: goserver
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -16,7 +16,39 @@ spec:
     spec:
       containers:
         - name: goserver
-          image: "thulerjoao/hello-go:v8"
+          image: "thulerjoao/hello-go:v9.1"
+
+          resources:
+            requests: # minimo -> reservando recursos do cluster p pod
+              cpu:  "100m" #100milicores(1 vCPU = 1000m)
+              memory: "20Mi" #20 megas
+            limits:
+              cpu:  "500m"
+              memory: "25Mi"
+
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8000 
+            periodSeconds: 3 
+            failureThreshold: 30
+
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000 
+            periodSeconds: 3 
+            failureThreshold: 1 
+
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000 
+            periodSeconds: 5 
+            failureThreshold: 1 
+            timeoutSeconds: 1 
+            successThreshold: 1
+
           envFrom:
             - configMapRef:
                 name: goserver-env
